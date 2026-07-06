@@ -1,0 +1,21 @@
+Skive-V
+=======
+
+This repository is a fork of vLLM (https://github.com/vllm-project/vllm),
+based on tag v0.23.0, commit 0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665.
+vLLM is licensed under the Apache License 2.0; its LICENSE file is retained
+in this repository unchanged.
+
+Modifications in this fork (SKIVE — value-aware, block-wise KV-cache eviction):
+  * Added config/CLI flags: kv_evict_enabled, kv_evict_budget,
+    kv_evict_num_sink_blocks, kv_evict_num_local_blocks
+    (vllm/config/cache.py, vllm/engine/arg_utils.py).
+  * Added the vllm/kv_evict/ package (block scoring, eviction policy,
+    worker/scheduler integration).
+  * Added eviction hooks in the V1 model runner (vllm/v1/worker/gpu_model_runner.py)
+    and scheduler-side block reclaim in vllm/v1/engine/core.py.
+  * Added a guard in the V2 model runner (vllm/v1/worker/gpu/model_runner.py)
+    that raises if eviction is enabled (eviction is implemented for the V1
+    runner only; set VLLM_USE_V2_MODEL_RUNNER=0).
+
+With kv_evict_enabled=False (the default), behavior is identical to stock vLLM.
