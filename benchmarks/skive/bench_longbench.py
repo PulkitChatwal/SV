@@ -71,8 +71,10 @@ def worker(label, mode, metric, stride, bsz, budget, sink, local, task):
     from vllm import LLM, SamplingParams
     rows = load_task(task)[:NPER]
     evict = mode != "off"
+    gpu_mem = float(os.environ.get("GPUMEM", "0.90"))
+    max_len = int(os.environ.get("MAXLEN", "32768"))
     kw = dict(model=MODEL, dtype="bfloat16", seed=0, enforce_eager=True, trust_remote_code=True,
-              enable_prefix_caching=False, gpu_memory_utilization=0.90, max_model_len=32768,
+              enable_prefix_caching=False, gpu_memory_utilization=gpu_mem, max_model_len=max_len,
               block_size=bsz, kv_evict_enabled=evict, kv_evict_budget=(budget if evict else 1),
               kv_evict_num_sink_blocks=sink, kv_evict_num_local_blocks=local)
     llm = LLM(**kw); tok = llm.get_tokenizer()
